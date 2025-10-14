@@ -21,6 +21,20 @@
     </properties>
 
     <dependencies>
+        <!-- Spark Java Web Framework -->
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        
+        <!-- SLF4J Simple Logger -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        
         <!-- JUnit for testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -58,10 +72,33 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.example.App</mainClass>
+                            <mainClass>com.example.WebApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            
+            <!-- Maven Shade Plugin for creating fat JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.example.WebApp</mainClass>
+                                </transformer>
+                            </transformers>
+                            <finalName>${project.artifactId}-${project.version}-standalone</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

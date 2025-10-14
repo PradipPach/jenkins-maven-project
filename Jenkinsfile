@@ -183,14 +183,19 @@ pipeline {
                         echo "  - Application: jenkins-maven-project"
                         echo "  - Version: 1.0-SNAPSHOT"
                         echo "  - Build: #${BUILD_NUMBER}"
+                        echo "  - JAR: jenkins-maven-project-1.0-SNAPSHOT-standalone.jar"
                         echo "  - Status: Ready"
+                        echo ""
+                        echo "To run the web application locally:"
+                        echo "  java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar"
+                        echo "  Then open: http://localhost:4567"
                     '''
                     
                     echo '\n✓ Deployment completed successfully!'
                     
                     // Uncomment below for actual deployment
                     // Example: Deploy to server
-                    // sh 'scp target/*.jar user@server:/deploy/path/'
+                    // sh 'scp target/*-standalone.jar user@server:/deploy/path/'
                     // sh 'ssh user@server "systemctl restart app-service"'
                     
                     // Example: Deploy to Docker
@@ -204,6 +209,9 @@ pipeline {
             post {
                 success {
                     echo '✓ Deployment stage completed successfully'
+                    echo 'Web application is ready to run!'
+                    echo 'Download the JAR from Jenkins artifacts and run:'
+                    echo 'java -jar jenkins-maven-project-1.0-SNAPSHOT-standalone.jar'
                 }
                 failure {
                     echo '✗ Deployment stage failed'
