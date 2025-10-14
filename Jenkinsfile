@@ -167,7 +167,7 @@ pipeline {
                     // Simulate deployment steps
                     echo '\nSimulating Deployment Steps:'
                     echo '1. Validating artifact...'
-                    sh 'test -f target/*.jar && echo "✓ Artifact validation passed"'
+                    sh 'test -f target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar && echo "✓ Artifact validation passed"'
                     
                     echo '2. Preparing deployment environment...'
                     sh 'echo "✓ Environment ready for deployment"'
