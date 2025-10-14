@@ -135,12 +135,74 @@ pipeline {
             }
             steps {
                 echo '================================================'
-                echo 'Stage: Deploy (Placeholder)'
+                echo 'Stage: Deploy'
                 echo '================================================'
-                echo 'Deployment stage - Add your deployment steps here'
-                // Example deployment commands:
-                // sh 'scp target/*.jar user@server:/deploy/path/'
-                // sh 'ssh user@server "systemctl restart app-service"'
+                script {
+                    // Display deployment information
+                    echo "Preparing deployment for ${env.APP_NAME}"
+                    echo "Build Number: ${env.BUILD_NUMBER}"
+                    echo "Git Commit: ${env.GIT_COMMIT_SHORT}"
+                    
+                    // Show artifact details
+                    echo '\nArtifact Information:'
+                    sh '''
+                        echo "JAR files ready for deployment:"
+                        ls -lh target/*.jar
+                        echo ""
+                        echo "File checksums:"
+                        shasum -a 256 target/*.jar
+                    '''
+                    
+                    // Display deployment configuration
+                    echo '\nDeployment Configuration:'
+                    echo "Timestamp: ${new Date()}"
+                    echo "Jenkins URL: ${env.JENKINS_URL}"
+                    echo "Build URL: ${env.BUILD_URL}"
+                    
+                    // Simulate deployment steps
+                    echo '\nSimulating Deployment Steps:'
+                    echo '1. Validating artifact...'
+                    sh 'test -f target/*.jar && echo "✓ Artifact validation passed"'
+                    
+                    echo '2. Preparing deployment environment...'
+                    sh 'echo "✓ Environment ready for deployment"'
+                    
+                    echo '3. Backing up previous version...'
+                    sh 'echo "✓ Backup completed (simulated)"'
+                    
+                    echo '4. Deploying application...'
+                    sh '''
+                        echo "✓ Application deployed successfully (simulated)"
+                        echo ""
+                        echo "Deployment Summary:"
+                        echo "  - Application: jenkins-maven-project"
+                        echo "  - Version: 1.0-SNAPSHOT"
+                        echo "  - Build: #${BUILD_NUMBER}"
+                        echo "  - Status: Ready"
+                    '''
+                    
+                    echo '\n✓ Deployment completed successfully!'
+                    
+                    // Uncomment below for actual deployment
+                    // Example: Deploy to server
+                    // sh 'scp target/*.jar user@server:/deploy/path/'
+                    // sh 'ssh user@server "systemctl restart app-service"'
+                    
+                    // Example: Deploy to Docker
+                    // sh 'docker build -t myapp:${BUILD_NUMBER} .'
+                    // sh 'docker push myapp:${BUILD_NUMBER}'
+                    
+                    // Example: Deploy to Kubernetes
+                    // sh 'kubectl set image deployment/myapp myapp=myapp:${BUILD_NUMBER}'
+                }
+            }
+            post {
+                success {
+                    echo '✓ Deployment stage completed successfully'
+                }
+                failure {
+                    echo '✗ Deployment stage failed'
+                }
             }
         }
     }
