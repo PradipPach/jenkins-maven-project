@@ -155,7 +155,7 @@ pipeline {
                         ls -lh target/*.jar
                         echo ""
                         echo "File checksums:"
-                        shasum -a 256 target/*.jar
+                        sha256sum target/*.jar || shasum -a 256 target/*.jar || echo "Checksum tool not available"
                     '''
                     
                     // Display deployment configuration
