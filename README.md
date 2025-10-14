@@ -2,6 +2,15 @@
 
 This is a sample Maven project configured with Jenkins Pipeline for CI/CD.
 
+## Getting Started
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/atulkamble/jenkins-maven-project.git
+cd jenkins-maven-project
+```
+
 ## Project Structure
 
 ```
@@ -61,8 +70,9 @@ Go to **Manage Jenkins** → **Global Tool Configuration**:
 1. Create a new **Pipeline** job in Jenkins
 2. Under **Pipeline** section:
    - **Definition**: Pipeline script from SCM
-   - **SCM**: Git (or your version control system)
-   - **Repository URL**: Your repository URL
+   - **SCM**: Git
+   - **Repository URL**: `https://github.com/atulkamble/jenkins-maven-project.git`
+   - **Branch**: `*/main`
    - **Script Path**: Jenkinsfile
 
 ### 3. Run the Pipeline
