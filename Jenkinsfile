@@ -188,7 +188,7 @@ pipeline {
                         echo ""
                         echo "To run the web application locally:"
                         echo "  java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar"
-                        echo "  Then open: http://localhost:4567"
+                        echo "  Then open: http://localhost:5000"
                     '''
                     
                     echo '\n✓ Deployment completed successfully!'

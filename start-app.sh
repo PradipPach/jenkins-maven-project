@@ -11,7 +11,7 @@ if [ -f "$PID_FILE" ]; then
     PID=$(cat "$PID_FILE")
     if ps -p "$PID" > /dev/null 2>&1; then
         echo "Application is already running (PID: $PID)"
-        echo "Access it at: http://localhost:4567"
+        echo "Access it at: http://localhost:5000"
         exit 0
     else
         echo "Removing stale PID file..."
@@ -38,7 +38,7 @@ if ps -p $(cat "$PID_FILE") > /dev/null 2>&1; then
     echo "✓ Application started successfully!"
     echo "  PID: $(cat $PID_FILE)"
     echo "  Log: $LOG_FILE"
-    echo "  URL: http://localhost:4567"
+    echo "  URL: http://localhost:5000"
     echo ""
     echo "To stop: ./stop-app.sh"
     echo "To check status: ./status-app.sh"

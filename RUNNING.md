@@ -4,7 +4,7 @@ This directory contains scripts and configurations to keep your web application 
 
 ## 🚀 Quick Start
 
-The application is **currently running** on: **http://localhost:4567**
+The application is **currently running** on: **http://localhost:5000**
 
 ## 📋 Management Commands
 
@@ -82,7 +82,7 @@ See `Dockerfile` and `docker-compose.yml` for containerized deployment.
 
 ### Check if application is responding:
 ```bash
-curl http://localhost:4567/health
+curl http://localhost:5000/health
 ```
 
 Expected response:
@@ -97,15 +97,15 @@ ps aux | grep jenkins-maven-project
 
 ### Check port usage:
 ```bash
-lsof -i :4567
+lsof -i :5000
 ```
 
 ## 🐛 Troubleshooting
 
 ### Application won't start
-1. Check if port 4567 is already in use:
+1. Check if port 5000 is already in use:
    ```bash
-   lsof -i :4567
+   lsof -i :5000
    ```
 
 2. Check the logs:
@@ -158,9 +158,9 @@ kill <PID>
 ## 🌐 Accessing the Application
 
 ### Local Access
-- **Web UI**: http://localhost:4567
-- **Health Check**: http://localhost:4567/health
-- **API Documentation**: http://localhost:4567/api
+- **Web UI**: http://localhost:5000
+- **Health Check**: http://localhost:5000/health
+- **API Documentation**: http://localhost:5000/api
 
 ### API Endpoints
 - `GET /` - Interactive calculator UI
@@ -173,13 +173,13 @@ kill <PID>
 ### Examples
 ```bash
 # Addition
-curl http://localhost:4567/api/add/10/5
+curl http://localhost:5000/api/add/10/5
 
 # Health check
-curl http://localhost:4567/health
+curl http://localhost:5000/health
 
 # Open in browser
-open http://localhost:4567
+open http://localhost:5000
 ```
 
 ## 📁 Files
@@ -205,7 +205,7 @@ For production deployment:
 
 ## 📝 Environment Variables
 
-- `PORT` - Server port (default: 4567)
+- `PORT` - Server port (default: 5000)
 
 Example:
 ```bash
@@ -216,5 +216,5 @@ PORT=8080 ./start-app.sh
 
 **Status**: ✅ **RUNNING**
 **PID**: Check with `./status-app.sh`
-**URL**: http://localhost:4567
+**URL**: http://localhost:5000
 **Started**: $(date)

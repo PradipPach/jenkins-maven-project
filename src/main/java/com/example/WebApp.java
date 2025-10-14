@@ -7,8 +7,10 @@ import static spark.Spark.*;
  */
 public class WebApp {
     
+    private static final Calculator calculator = new Calculator();
+    
     public static void main(String[] args) {
-        // Set port (default: 4567)
+        // Set port (default: 5000)
         port(getPort());
         
         // Enable CORS
@@ -29,7 +31,7 @@ public class WebApp {
         if (port != null) {
             return Integer.parseInt(port);
         }
-        return 4567; // Default Spark port
+        return 5000; // Default application port
     }
     
     private static void enableCORS() {
@@ -67,8 +69,7 @@ public class WebApp {
             try {
                 int a = Integer.parseInt(req.params(":a"));
                 int b = Integer.parseInt(req.params(":b"));
-                Calculator calc = new Calculator();
-                int result = calc.add(a, b);
+                int result = calculator.add(a, b);
                 return String.format("{\"operation\":\"add\",\"a\":%d,\"b\":%d,\"result\":%d}", a, b, result);
             } catch (NumberFormatException e) {
                 res.status(400);
@@ -82,8 +83,7 @@ public class WebApp {
             try {
                 int a = Integer.parseInt(req.params(":a"));
                 int b = Integer.parseInt(req.params(":b"));
-                Calculator calc = new Calculator();
-                int result = calc.subtract(a, b);
+                int result = calculator.subtract(a, b);
                 return String.format("{\"operation\":\"subtract\",\"a\":%d,\"b\":%d,\"result\":%d}", a, b, result);
             } catch (NumberFormatException e) {
                 res.status(400);
@@ -97,8 +97,7 @@ public class WebApp {
             try {
                 int a = Integer.parseInt(req.params(":a"));
                 int b = Integer.parseInt(req.params(":b"));
-                Calculator calc = new Calculator();
-                int result = calc.multiply(a, b);
+                int result = calculator.multiply(a, b);
                 return String.format("{\"operation\":\"multiply\",\"a\":%d,\"b\":%d,\"result\":%d}", a, b, result);
             } catch (NumberFormatException e) {
                 res.status(400);
@@ -112,8 +111,7 @@ public class WebApp {
             try {
                 int a = Integer.parseInt(req.params(":a"));
                 int b = Integer.parseInt(req.params(":b"));
-                Calculator calc = new Calculator();
-                double result = calc.divide(a, b);
+                double result = calculator.divide(a, b);
                 return String.format("{\"operation\":\"divide\",\"a\":%d,\"b\":%d,\"result\":%.2f}", a, b, result);
             } catch (NumberFormatException e) {
                 res.status(400);

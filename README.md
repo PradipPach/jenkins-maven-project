@@ -89,13 +89,13 @@ nohup java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar > app.l
 
 Once the application is running, access it in your browser:
 
-- **Home Page**: http://localhost:4567
+- **Home Page**: http://localhost:5000
 - **Calculator API**:
-  - Add: http://localhost:4567/api/add/10/5
-  - Subtract: http://localhost:4567/api/subtract/20/8
-  - Multiply: http://localhost:4567/api/multiply/6/7
-  - Divide: http://localhost:4567/api/divide/50/5
-- **Health Check**: http://localhost:4567/health
+  - Add: http://localhost:5000/api/add/10/5
+  - Subtract: http://localhost:5000/api/subtract/20/8
+  - Multiply: http://localhost:5000/api/multiply/6/7
+  - Divide: http://localhost:5000/api/divide/50/5
+- **Health Check**: http://localhost:5000/health
 
 ### Features
 

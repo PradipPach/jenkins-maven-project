@@ -11,7 +11,7 @@ docker build -t jenkins-maven-project:latest .
 ```bash
 docker run -d \
   --name jenkins-maven-project \
-  -p 4567:4567 \
+  -p 5000:5000 \
   --restart unless-stopped \
   jenkins-maven-project:latest
 ```
@@ -53,8 +53,8 @@ docker-compose up -d --build
 ## Access the Application
 
 Once running in Docker:
-- **URL**: http://localhost:4567
-- **Health Check**: http://localhost:4567/health
+- **URL**: http://localhost:5000
+- **Health Check**: http://localhost:5000/health
 
 ## Docker Commands Reference
 

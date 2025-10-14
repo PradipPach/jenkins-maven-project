@@ -41,3 +41,6 @@ app.log
 app-error.log
 app.pid
 nohup.out
+
+# GitHub Copilot upgrade tools
+.github/java-upgrade/

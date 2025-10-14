@@ -3,7 +3,7 @@
 
 APP_NAME="jenkins-maven-project"
 PID_FILE="app.pid"
-PORT=4567
+PORT=5000
 
 echo "========================================"
 echo "  $APP_NAME Status"
