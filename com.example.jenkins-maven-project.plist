@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.example.jenkins-maven-project</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/java</string>
+        <string>-jar</string>
+        <string>/Users/atul/Downloads/jenkins-maven-project/target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/atul/Downloads/jenkins-maven-project</string>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/atul/Downloads/jenkins-maven-project/app.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/atul/Downloads/jenkins-maven-project/app-error.log</string>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PORT</key>
+        <string>4567</string>
+    </dict>
+</dict>
+</plist>

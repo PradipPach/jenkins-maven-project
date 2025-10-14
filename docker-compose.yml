@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  jenkins-maven-project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jenkins-maven-project
+    ports:
+      - "4567:4567"
+    environment:
+      - PORT=4567
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4567/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-network:
+    driver: bridge

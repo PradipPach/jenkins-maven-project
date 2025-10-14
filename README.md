@@ -56,6 +56,35 @@ mvn package
 java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar
 ```
 
+### Running the Web Application
+
+#### Quick Start (with management scripts)
+```bash
+# Start the application
+./start-app.sh
+
+# Check status
+./status-app.sh
+
+# Stop the application
+./stop-app.sh
+
+# Restart the application
+./restart-app.sh
+
+# View logs
+tail -f app.log
+```
+
+#### Manual Start
+```bash
+# Run in foreground
+java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar
+
+# Run in background (keeps running after terminal closes)
+nohup java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar > app.log 2>&1 &
+```
+
 ### Accessing the Web Application
 
 Once the application is running, access it in your browser:
@@ -75,6 +104,24 @@ Once the application is running, access it in your browser:
 - 📊 **Real-time Results** - Instant calculations via AJAX
 - ✅ **Health Monitoring** - Built-in health check endpoint
 - 🚀 **Production Ready** - Standalone JAR with all dependencies
+- 🔄 **Keep Running** - Management scripts and service configurations
+- 🐳 **Docker Ready** - Dockerfile and docker-compose included
+
+### Keeping the Application Running
+
+See [RUNNING.md](RUNNING.md) for detailed instructions on:
+- Management scripts (start, stop, status, restart)
+- macOS launchd service setup (auto-start on boot)
+- Docker deployment
+- Troubleshooting
+
+**Quick Commands:**
+```bash
+./start-app.sh    # Start application
+./status-app.sh   # Check status
+./stop-app.sh     # Stop application
+tail -f app.log   # View logs
+```
 
 ## Jenkins Setup
 
