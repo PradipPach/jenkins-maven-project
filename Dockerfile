@@ -1,5 +1,5 @@
 # Multi-stage build for Jenkins Maven Project
-FROM maven:3.9.5-eclipse-temurin-11 AS builder
+FROM maven:3.9.5-eclipse-temurin-21 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -15,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:11-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Install curl for healthchecks
 RUN apk add --no-cache curl
