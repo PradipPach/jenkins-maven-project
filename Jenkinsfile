@@ -11,7 +11,7 @@ pipeline {
         APP_NAME = 'jenkins-maven-project'
         BUILD_VERSION = "${env.BUILD_NUMBER}"
         MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
-        DOCKER_IMAGE = "atulkamble/${APP_NAME}"
+        DOCKER_IMAGE = "atuljkamble/${APP_NAME}"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         PORT = '5000'
     }
