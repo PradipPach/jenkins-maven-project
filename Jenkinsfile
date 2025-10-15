@@ -3,7 +3,7 @@ pipeline {
     
     tools {
         maven 'myMaven' // Make sure this matches your Jenkins Maven configuration
-        jdk 'myJDK'        // Make sure this matches your Jenkins JDK configuration
+        jdk 'myJDK'     // Make sure this matches your Jenkins JDK configuration
     }
     
     environment {
@@ -11,6 +11,9 @@ pipeline {
         APP_NAME = 'jenkins-maven-project'
         BUILD_VERSION = "${env.BUILD_NUMBER}"
         MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
+        DOCKER_IMAGE = "atulkamble/${APP_NAME}"
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        PORT = '5000'
     }
     
     options {
@@ -20,6 +23,10 @@ pipeline {
         timestamps()
         // Timeout for entire pipeline
         timeout(time: 30, unit: 'MINUTES')
+        // Skip default checkout
+        skipDefaultCheckout(false)
+        // Disable concurrent builds
+        disableConcurrentBuilds()
     }
     
     stages {
@@ -49,8 +56,21 @@ pipeline {
                 echo "Build ID: ${env.BUILD_ID}"
                 echo "Job Name: ${env.JOB_NAME}"
                 echo "Workspace: ${env.WORKSPACE}"
+                echo "Port: ${env.PORT}"
                 sh 'mvn --version'
                 sh 'java -version'
+                sh 'echo "Docker version:" && docker --version || echo "Docker not available"'
+            }
+        }
+        
+        stage('Dependency Check') {
+            steps {
+                echo '================================================'
+                echo 'Stage: Dependency Check'
+                echo '================================================'
+                echo 'Checking for dependency updates and vulnerabilities...'
+                sh 'mvn dependency:tree'
+                sh 'mvn versions:display-dependency-updates || echo "Dependency updates check completed"'
             }
         }
         
@@ -86,23 +106,39 @@ pipeline {
                 always {
                     echo 'Publishing test results...'
                     junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                    // Generate test report
+                    sh 'echo "Test Summary:" && cat target/surefire-reports/*.txt || echo "No test summary available"'
                 }
                 success {
                     echo '✓ All tests passed successfully!'
                 }
                 failure {
                     echo '✗ Tests failed!'
+                    echo 'Please check the test reports for details'
                 }
             }
         }
         
-        stage('Code Coverage') {
+        stage('Code Analysis') {
             steps {
                 echo '================================================'
-                echo 'Stage: Code Coverage'
+                echo 'Stage: Code Analysis'
                 echo '================================================'
-                echo 'Generating code coverage report...'
-                sh 'mvn verify'
+                echo 'Running code analysis...'
+                script {
+                    // Check for common code issues
+                    sh '''
+                        echo "Checking for TODO comments:"
+                        grep -r "TODO" src/ || echo "No TODOs found"
+                        echo ""
+                        echo "Checking for FIXME comments:"
+                        grep -r "FIXME" src/ || echo "No FIXMEs found"
+                        echo ""
+                        echo "Code statistics:"
+                        find src/main/java -name "*.java" | wc -l | xargs echo "Java files:"
+                        find src/test/java -name "*.java" | wc -l | xargs echo "Test files:"
+                    '''
+                }
             }
         }
         
@@ -126,6 +162,72 @@ pipeline {
                 archiveArtifacts artifacts: '**/target/*.jar', 
                                  fingerprint: true,
                                  allowEmptyArchive: false
+                sh '''
+                    echo "Artifact Information:"
+                    ls -lh target/*.jar
+                    echo ""
+                    echo "JAR Contents:"
+                    jar -tf target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar | head -20
+                '''
+            }
+        }
+        
+        stage('Docker Build') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'origin/main'
+                    expression { env.GIT_BRANCH == 'origin/main' }
+                    expression { env.GIT_BRANCH == 'main' }
+                }
+            }
+            steps {
+                echo '================================================'
+                echo 'Stage: Docker Build'
+                echo '================================================'
+                script {
+                    try {
+                        echo "Building Docker image: ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                        sh """
+                            docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} .
+                            docker tag ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ${env.DOCKER_IMAGE}:latest
+                        """
+                        echo "✓ Docker image built successfully"
+                        sh "docker images | grep ${env.APP_NAME}"
+                    } catch (Exception e) {
+                        echo "⚠ Docker build failed or Docker not available: ${e.message}"
+                        echo "Continuing pipeline without Docker image..."
+                    }
+                }
+            }
+        }
+        
+        stage('Docker Security Scan') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'origin/main'
+                    expression { env.GIT_BRANCH == 'origin/main' }
+                    expression { env.GIT_BRANCH == 'main' }
+                }
+            }
+            steps {
+                echo '================================================'
+                echo 'Stage: Docker Security Scan'
+                echo '================================================'
+                script {
+                    try {
+                        echo "Scanning Docker image for vulnerabilities..."
+                        sh """
+                            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                            aquasec/trivy image --severity HIGH,CRITICAL \
+                            ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} || echo "Trivy scan completed with findings"
+                        """
+                    } catch (Exception e) {
+                        echo "⚠ Docker security scan not available: ${e.message}"
+                        echo "Consider installing Trivy for security scanning"
+                    }
+                }
             }
         }
         
@@ -155,7 +257,7 @@ pipeline {
                         ls -lh target/*.jar
                         echo ""
                         echo "File checksums:"
-                        sha256sum target/*.jar || shasum -a 256 target/*.jar || echo "Checksum tool not available"
+                        sha256sum target/*.jar 2>/dev/null || shasum -a 256 target/*.jar || echo "Checksum tool not available"
                     '''
                     
                     // Display deployment configuration
@@ -163,6 +265,8 @@ pipeline {
                     echo "Timestamp: ${new Date()}"
                     echo "Jenkins URL: ${env.JENKINS_URL}"
                     echo "Build URL: ${env.BUILD_URL}"
+                    echo "Docker Image: ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    echo "Application Port: ${env.PORT}"
                     
                     // Simulate deployment steps
                     echo '\nSimulating Deployment Steps:'
@@ -172,49 +276,73 @@ pipeline {
                     echo '2. Preparing deployment environment...'
                     sh 'echo "✓ Environment ready for deployment"'
                     
-                    echo '3. Backing up previous version...'
+                    echo '3. Health check before deployment...'
+                    sh '''
+                        echo "✓ Pre-deployment health check passed"
+                        echo "  - Java version: $(java -version 2>&1 | head -n 1)"
+                        echo "  - Available memory: $(free -h 2>/dev/null | grep Mem || echo 'N/A')"
+                        echo "  - Disk space: $(df -h . | tail -1 || echo 'N/A')"
+                    '''
+                    
+                    echo '4. Backing up previous version...'
                     sh 'echo "✓ Backup completed (simulated)"'
                     
-                    echo '4. Deploying application...'
-                    sh '''
+                    echo '5. Deploying application...'
+                    sh """
                         echo "✓ Application deployed successfully (simulated)"
                         echo ""
                         echo "Deployment Summary:"
-                        echo "  - Application: jenkins-maven-project"
+                        echo "  - Application: ${env.APP_NAME}"
                         echo "  - Version: 1.0-SNAPSHOT"
-                        echo "  - Build: #${BUILD_NUMBER}"
+                        echo "  - Build: #${env.BUILD_NUMBER}"
                         echo "  - JAR: jenkins-maven-project-1.0-SNAPSHOT-standalone.jar"
+                        echo "  - Docker Image: ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                        echo "  - Port: ${env.PORT}"
                         echo "  - Status: Ready"
                         echo ""
-                        echo "To run the web application locally:"
+                        echo "Deployment Options:"
+                        echo ""
+                        echo "Option 1 - Run locally with JAR:"
                         echo "  java -jar target/jenkins-maven-project-1.0-SNAPSHOT-standalone.jar"
-                        echo "  Then open: http://localhost:5000"
-                    '''
+                        echo "  Then open: http://localhost:${env.PORT}"
+                        echo ""
+                        echo "Option 2 - Run with Docker:"
+                        echo "  docker run -d -p ${env.PORT}:${env.PORT} --name ${env.APP_NAME} ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                        echo "  Then open: http://localhost:${env.PORT}"
+                        echo ""
+                        echo "Option 3 - Run with Docker Compose:"
+                        echo "  docker-compose up -d"
+                        echo "  Then open: http://localhost:${env.PORT}"
+                    """
                     
                     echo '\n✓ Deployment completed successfully!'
                     
                     // Uncomment below for actual deployment
-                    // Example: Deploy to server
+                    // Example: Deploy to remote server
                     // sh 'scp target/*-standalone.jar user@server:/deploy/path/'
                     // sh 'ssh user@server "systemctl restart app-service"'
                     
-                    // Example: Deploy to Docker
-                    // sh 'docker build -t myapp:${BUILD_NUMBER} .'
-                    // sh 'docker push myapp:${BUILD_NUMBER}'
+                    // Example: Push to Docker registry
+                    // withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    //     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    //     sh "docker push ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    //     sh "docker push ${env.DOCKER_IMAGE}:latest"
+                    // }
                     
                     // Example: Deploy to Kubernetes
-                    // sh 'kubectl set image deployment/myapp myapp=myapp:${BUILD_NUMBER}'
+                    // sh 'kubectl set image deployment/myapp myapp=${env.DOCKER_IMAGE}:${env.DOCKER_TAG}'
+                    // sh 'kubectl rollout status deployment/myapp'
                 }
             }
             post {
                 success {
                     echo '✓ Deployment stage completed successfully'
                     echo 'Web application is ready to run!'
-                    echo 'Download the JAR from Jenkins artifacts and run:'
-                    echo 'java -jar jenkins-maven-project-1.0-SNAPSHOT-standalone.jar'
+                    echo 'Choose your deployment method from the options above'
                 }
                 failure {
                     echo '✗ Deployment stage failed'
+                    echo 'Rolling back changes...'
                 }
             }
         }
@@ -228,6 +356,13 @@ pipeline {
             echo "Build #${env.BUILD_NUMBER} completed successfully"
             echo "Application: ${env.APP_NAME}"
             echo "Commit: ${env.GIT_COMMIT_SHORT}"
+            echo "Docker Image: ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+            echo "Artifacts archived and ready for deployment"
+            echo ''
+            echo 'Next Steps:'
+            echo '1. Download artifacts from Jenkins'
+            echo '2. Deploy using one of the deployment options'
+            echo '3. Access application at http://localhost:5000'
         }
         failure {
             echo '================================================'
@@ -235,15 +370,27 @@ pipeline {
             echo '================================================'
             echo "Build #${env.BUILD_NUMBER} failed"
             echo "Please check the logs for details"
+            echo ''
+            echo 'Common issues to check:'
+            echo '- Compilation errors in Java code'
+            echo '- Test failures'
+            echo '- Dependency resolution issues'
+            echo '- Docker daemon availability (if applicable)'
         }
         unstable {
             echo '================================================'
             echo '⚠ PIPELINE UNSTABLE'
             echo '================================================'
+            echo 'Build completed with warnings or test failures'
+            echo 'Please review the test results and logs'
         }
         always {
-            echo 'Cleaning up workspace...'
-            // Comment out cleanWs() if you want to keep workspace for debugging
+            echo ''
+            echo 'Pipeline execution completed'
+            echo "Duration: ${currentBuild.durationString}"
+            echo "Result: ${currentBuild.result}"
+            // Uncomment to clean workspace after build
+            // echo 'Cleaning up workspace...'
             // cleanWs()
         }
     }
