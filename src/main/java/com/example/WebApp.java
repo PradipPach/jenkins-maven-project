@@ -10,6 +10,9 @@ public class WebApp {
     private static final Calculator calculator = new Calculator();
     
     public static void main(String[] args) {
+        // Bind to all network interfaces (0.0.0.0) to allow external access
+        ipAddress("0.0.0.0");
+        
         // Set port (default: 5000)
         port(getPort());
         
@@ -22,7 +25,7 @@ public class WebApp {
         System.out.println("========================================");
         System.out.println("Server started successfully!");
         System.out.println("Access the application at:");
-        System.out.println("http://localhost:" + getPort());
+        System.out.println("http://0.0.0.0:" + getPort());
         System.out.println("========================================");
     }
     
