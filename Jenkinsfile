@@ -3,7 +3,7 @@ pipeline {
     
     tools {
         maven 'my maven' // Make sure this matches your Jenkins Maven configuration
-        jdk 'my jdk'     // Make sure this matches your Jenkins JDK configuration
+        jdk 'my JDK'     // Make sure this matches your Jenkins JDK configuration
     }
     
     environment {
