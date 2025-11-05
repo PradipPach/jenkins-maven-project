@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     tools {
-        maven 'MyMaven' // Make sure this matches your Jenkins Maven configuration
-        jdk 'MyJDK'     // Make sure this matches your Jenkins JDK configuration
+        maven 'My maven' // Make sure this matches your Jenkins Maven configuration
+        jdk 'My jdk'     // Make sure this matches your Jenkins JDK configuration
     }
     
     environment {
