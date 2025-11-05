@@ -48,14 +48,14 @@
         <plugins>
             <!-- Maven Compiler Plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                </configuration>
-            </plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-compiler-plugin</artifactId>
+  <version>3.14.1</version>
+  <configuration>
+      <release>21</release>
+  </configuration>
+</plugin>
+
 
             <!-- Maven Surefire Plugin for running tests -->
             <plugin>
